@@ -1,0 +1,63 @@
+#!/bin/bash
+
+verbose=0
+
+while getopts "hd:pt:m:v:k:r:s:e:" opt; do
+    case "$opt" in
+	t)
+	    series="$OPTARG"
+	    type="show"
+	    ;;
+	e) 
+	    episode="$OPTARG"
+	    ;;
+	s)
+	    season="$OPTARG"
+	    ;;
+	
+	k)
+	    if [ "$OPTARG" = "pv" ]; then
+		player="kodi"
+	    fi
+	    ;;
+	m)
+	    #name | series="$1"
+	    if [ "$OPTARG" = "pv" ]; then
+		player="mpv"
+	    else #movie
+		type="movie"
+		series="$OPTARG"
+	    fi
+	    ;;
+	r)
+	    search="$OPTARG"
+	    ;;
+	d)
+	    download=1
+	    ;;
+	v)
+	    if [ "$OPTARG" = "lc" ]; then
+		player="vlc"
+	    else
+		verbose=1
+	    fi
+	    ;;
+	c)
+	    player="chromecast"
+	h)
+	    echo "==== Arguments ====";
+	    echo -e "Title:\t\t-t | -m\tDoctor\ Who or \"Doctor Who\""
+	    echo -e "Result row:\t-r\t1 (default is 0) (1 in this case is 2005 Doctor Who vs classic )"
+	    echo -e "Season:\t\t-s\t9"
+	    echo -e "Episode:\t-e\t4"
+	    echo -e "Media Player:\t-kodi | -mpv | -vlc"
+	    echo -e "\nExample: $0 -t Doctor\ Who -r 1 -s 9 -e 4 -mpv"
+
+	    exit 0;
+	    ;;
+	\?)
+	    echo "Flag $opt = $OPTARG";
+	    exit
+	    ;;
+    esac
+done

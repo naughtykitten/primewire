@@ -1,0 +1,11 @@
+#!/bin/bash
+#primewire
+
+proto="$proto"www.
+site=primewire.ag
+qs='index.php?search_keywords='
+fn_qs="$0.inc/$site.sh/qs.sh"
+
+fn_row="$0.inc/$site.sh/row.sh"
+
+#echo $fn_row; exit 0;

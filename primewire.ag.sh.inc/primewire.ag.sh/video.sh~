@@ -1,6 +1,8 @@
 #!/bin/bash
 
 links=$(tac "$file" | grep goto\.php | grep href | grep -v script | grep Watch | sed 's_.*&url=\(.*\)&domain.*_\1_g' )
+domain=$(tac "$file" | grep goto\.php | grep href | grep -v script | grep Watch | sed 's_.*&domain=\(.*\)&loggedin.*_\1_g' | tr "\n" " " )
+domain=($domain)
 #firefox-esr "file://$file"
 #| grep "cale" | sed 's_.*?r=\(.*\)" cl.*title="\(.*\)" style.*_\1_g');
 #links=$(echo "$links" )
@@ -31,8 +33,14 @@ count=1
 IFS=$'\n'
 for link in $links; do
     l[$count]=$(echo "$link" | openssl base64 -d)
+    dom[$count]=$(echo ${domain[$count]} | openssl base64 -d)
     #echo "${l[$count]}"
+    echo "$0.inc/blacklist/${dom[$count]}"
 
+    if [ -f "$0.inc/blacklist/${dom[$count]}" ]; then
+	continue
+    fi
+    
     file="$cache/$episode_$title.html"
     url=''
     #if [ ! -f "$file" ]; then
@@ -43,6 +51,14 @@ for link in $links; do
 	code=$(curl -L -s -o /dev/null -w "%{http_code}" "${l[$count]}");
 
 	if [ "$code" = "200" ]; then
+	    error=$(youtube-dl -g "${l[$count]}" 2>&1 )
+	    if [ -z "${error##*ERROR*}" ]; then
+		#add domain to blacklist
+		echo "" > "$0.inc/blacklist/${dom[$count]}"
+		
+	        continue
+	    fi
+	    
 	    url=$(youtube-dl -g "${l[$count]}")
 	    filename=$(youtube-dl --get-filename "${l[$count]}")
 	fi
@@ -131,6 +147,9 @@ if [ ! -z "$url" ]; then
 		#incomplete
 		#wget -o "$wget_log" -O - "$url" > "$video" &
 	    fi
+
+	    logPath=$(echo "$0.inc/history/"${series%&*}"_S$season""_E$episode.url")
+	    echo "$url" > "$logPath"
 	    
 	    case "$player" in
 	    	1|Kodi|kodi)
@@ -150,6 +169,9 @@ if [ ! -z "$url" ]; then
 	    	3|VLC|vlc)
 	    	    vlc "$url"
 	    	    ;;
+		4|chromecast)
+		    stream2chromecast -playurl "$url"
+		    ;;
 	    esac
 
 	    # if [ -z "$player" ]; then

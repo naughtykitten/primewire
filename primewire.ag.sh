@@ -1,5 +1,6 @@
 #!/bin/bash
-
+#echo ${*:1}
+#exit 0
 PWD=$(pwd)
 
 #contains getopts

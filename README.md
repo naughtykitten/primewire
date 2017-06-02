@@ -20,4 +20,4 @@ Example: ./primewire.ag.sh -t Show\ Name -r 1 -s 9 -e 4 -mpv
 
 ==== Todo ====
 
-Add blacklist for unsupported links.
+Unknown...

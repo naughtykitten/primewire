@@ -2,8 +2,16 @@
 
 verbose=0
 
-while getopts "hd:pt:m:v:k:r:s:e:" opt; do
+while getopts "hd:pt:m:v:k:r:s:e:ln" opt; do
     case "$opt" in
+	l)
+	    loadPath=1
+	    #cat $0.inc/
+	    ;;
+	n)
+	    #next
+	    exit 0
+	    ;;
 	t)
 	    series="$OPTARG"
 	    type="show"
@@ -62,3 +70,31 @@ while getopts "hd:pt:m:v:k:r:s:e:" opt; do
 	    ;;
     esac
 done
+
+logPath=$(echo "$0.inc/history/"${series%&*}"_S$season""_E$episode.url" | sed 's/ /+/g')
+if [ -f "$logPath" ]; then
+    url=$(cat $logPath)
+    
+    case "$player" in
+	1|Kodi|kodi)
+	    curl --silent -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"GUI.ShowNotification","params":{"title":"Playing '"$series_t"'","message":"'"$title"'"},"id":1}' http://kodi@localhost:8080/jsonrpc > /dev/null
+	    ./kodi "$url" 
+	    read -p "Press ^C when complete or ESC if video fails to load." complete
+	    ;;
+	2|mpv)
+	    #tail -f "$input" | mpv "$video" >> "$output" &
+	    if [ -f "/usr/local/bin/mypv" ]; then
+		mypv "$url"
+	    else
+		#/usr/local/bin/mypv
+	    	mpv --cache 128000 --cache-seek-min 100 --cache-initial 200 --fullscreen "$url"
+	    fi
+	    ;;
+	3|VLC|vlc)
+	    vlc "$url"
+	    ;;
+	4|chromecast)
+	    stream2chromecast -playurl "$url"
+	    ;;
+    esac
+fi

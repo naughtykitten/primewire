@@ -44,6 +44,7 @@ while getopts "hd:pt:m:v:k:r:s:e:" opt; do
 	    ;;
 	c)
 	    player="chromecast"
+	    ;;
 	h)
 	    echo "==== Arguments ====";
 	    echo -e "Title:\t\t-t | -m\tDoctor\ Who or \"Doctor Who\""

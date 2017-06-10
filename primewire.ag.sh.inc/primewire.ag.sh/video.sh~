@@ -35,9 +35,10 @@ for link in $links; do
     l[$count]=$(echo "$link" | openssl base64 -d)
     dom[$count]=$(echo ${domain[$count]} | openssl base64 -d)
     #echo "${l[$count]}"
-    echo "$0.inc/blacklist/${dom[$count]}"
+    #echo "$0.inc/blacklist/${dom[$count]}"
 
     if [ -f "$0.inc/blacklist/${dom[$count]}" ]; then
+	count=$(($count+1))
 	continue
     fi
     
@@ -53,9 +54,9 @@ for link in $links; do
 	if [ "$code" = "200" ]; then
 	    error=$(youtube-dl -g "${l[$count]}" 2>&1 )
 	    if [ -z "${error##*ERROR*}" ]; then
-		#add domain to blacklist
+		echo "Blacklisting domain: ${dom[$count]}"
 		echo "" > "$0.inc/blacklist/${dom[$count]}"
-		
+		count=$(($count+1))
 	        continue
 	    fi
 	    
@@ -150,6 +151,8 @@ if [ ! -z "$url" ]; then
 
 	    logPath=$(echo "$0.inc/history/"${series%&*}"_S$season""_E$episode.url")
 	    echo "$url" > "$logPath"
+
+	    echo "Steaming from: ${dom[$count]}"
 	    
 	    case "$player" in
 	    	1|Kodi|kodi)

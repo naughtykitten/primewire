@@ -37,7 +37,7 @@ for link in $links; do
     #echo "${l[$count]}"
     #echo "$0.inc/blacklist/${dom[$count]}"
 
-    if [ -f "$0.inc/blacklist/${dom[$count]}" ]; then
+    if [ -f "$0.inc/blacklist/${dom[$count]}" ] || [ -z "${dom[$count]}" ]; then
 	count=$(($count+1))
 	continue
     fi
@@ -53,8 +53,9 @@ for link in $links; do
 
 	if [ "$code" = "200" ]; then
 	    error=$(youtube-dl -g "${l[$count]}" 2>&1 )
-	    if [ -z "${error##*ERROR*}" ]; then
-		echo "Blacklisting domain: ${dom[$count]}"
+	    if [ -z "${error##*Unsupported URL*}" ]; then
+		echo "Blacklisting unsupported domain: ${dom[$count]}"
+		#echo "$error"
 		echo "" > "$0.inc/blacklist/${dom[$count]}"
 		count=$(($count+1))
 	        continue
